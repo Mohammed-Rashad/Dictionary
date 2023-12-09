@@ -1,48 +1,49 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Scanner;
 
 public class Dictionary {
-
-    private HashTable container;
+    private Container container;
     Dictionary() {
-        //666511
-        container = new HashTable(666511);
-    }
-    Dictionary(int tableSize) {
-        container = new HashTable(tableSize);
+        container = new Container();
     }
     Dictionary(String word) {
         this();
-        container.add(word);
+        if (!container.contains(word)) {
+            container.insert(word);
+        }else {
+            throw new WordAlreadyExistsException();
+        }
     }
     Dictionary(File file) throws FileNotFoundException {
         this();
-        
         try {
-            long begin = System.currentTimeMillis();
+            //long begin = System.currentTimeMillis();
             Scanner reader = new Scanner(file);
             while (reader.hasNext()) {
                 String word = reader.next();
-                container.add(word);
+                container.insert(word);
             }
-            System.out.println(System.currentTimeMillis()-begin);
+            //System.out.println(System.currentTimeMillis()-begin);
         } catch (FileNotFoundException e) {
             throw new FileNotFoundException("File not Found");
         }
         
     }
     public void addWord(String word) throws WordAlreadyExistsException{
-        if (container.contains(word)) {
+        if (!container.contains(word)) {
+            container.insert(word);
+        } else {
             throw new WordAlreadyExistsException();
         }
-        container.add(word);
     }
     public void removeWord(String word) throws WordNotFoundException{
         if (!container.contains(word)) {
             throw new WordNotFoundException();
         }
+
         container.remove(word);
     }
     public String[] findSimilar(String word) {
@@ -79,34 +80,13 @@ public class Dictionary {
         
         return similarWords.toArray();
     }
-
     public boolean contains(String word) {
         return container.contains(word);
     }
 
-    public ArrayList<Integer> dist() {
-        return container.dist();
-    }
-    public int[] stat(ArrayList<Integer> counter, int maxi) {
-        int[] meta = new int[maxi+1];
-        for (Integer num: counter) {
-            meta[num] += 1;
-        }
-        return meta;
-    }
-    
 }
 
 
 
-class WordAlreadyExistsException extends RuntimeException {
-    WordAlreadyExistsException() {
-        super("Word already exist in the dictionary");
-    }
-}
 
-class WordNotFoundException extends RuntimeException {
-    WordNotFoundException() {
-        super("Word is not in the dictionary");
-    }
-}
+
